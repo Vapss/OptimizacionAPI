@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Optimización de Ingredientes</title>
+</head>
+<body>
+    <h1>Optimización de Ingredientes</h1>
+    
+    <div>
+        <label for="costos">Costos (separados por comas):</label>
+        <input type="text" id="costos" placeholder="Ejemplo: 3, 2, 5">
+    </div>
+
+    <div>
+        <label for="utilidad">Coeficientes de Utilidad (separados por comas):</label>
+        <input type="text" id="utilidad" placeholder="Ejemplo: -5, -4, -6">
+    </div>
+
+    <div>
+        <label for="cantidades_disponibles">Cantidades Disponibles (separadas por comas):</label>
+        <input type="text" id="cantidades_disponibles" placeholder="Ejemplo: 4, 6, 8">
+    </div>
+
+    <button onclick="optimizar()">Optimizar</button>
+
+    <div id="resultado"></div>
+
+    <script>
+        async function optimizar() {
+            const costos = document.getElementById("costos").value.split(",").map(parseFloat);
+            const utilidad = document.getElementById("utilidad").value.split(",").map(parseFloat);
+            const cantidades_disponibles = document.getElementById("cantidades_disponibles").value.split(",").map(parseFloat);
+
+            const data = {
+                costos: costos,
+                utilidad: utilidad,
+                cantidades_disponibles: cantidades_disponibles
+            };
+
+            try {
+                const response = await fetch('http://localhost:8000/optimizar/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                const resultado = await response.json();
+                document.getElementById("resultado").innerHTML = `
+                    <p>Cantidades óptimas:</p>
+                    <pre>${JSON.stringify(resultado.cantidades_optimas, null, 2)}</pre>
+                    <p>Beneficio máximo: ${resultado.beneficio_maximo}</p>
+                `;
+            } catch (error) {
+                console.error('Error al realizar la solicitud:', error);
+            }
+        }
+    </script>
+</body>
+</html>
