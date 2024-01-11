@@ -1,63 +1,62 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Optimización de Ingredientes</title>
+    <title>Optimization Solver</title>
 </head>
 <body>
-    <h1>Optimización de Ingredientes</h1>
-    
+
+    <h1>Optimization Solver</h1>
+
     <div>
-        <label for="costos">Costos (separados por comas):</label>
-        <input type="text" id="costos" placeholder="Ejemplo: 3, 2, 5">
+        <label for="matrixA">Matrix A:</label>
+        <textarea id="matrixA" rows="3" cols="30"></textarea>
     </div>
 
     <div>
-        <label for="utilidad">Coeficientes de Utilidad (separados por comas):</label>
-        <input type="text" id="utilidad" placeholder="Ejemplo: -5, -4, -6">
+        <label for="vectorB">Vector B:</label>
+        <textarea id="vectorB" rows="1" cols="30"></textarea>
     </div>
 
     <div>
-        <label for="cantidades_disponibles">Cantidades Disponibles (separadas por comas):</label>
-        <input type="text" id="cantidades_disponibles" placeholder="Ejemplo: 4, 6, 8">
+        <label for="vectorC">Vector C:</label>
+        <textarea id="vectorC" rows="1" cols="30"></textarea>
     </div>
 
-    <button onclick="optimizar()">Optimizar</button>
+    <button onclick="solveOptimization()">Solve</button>
 
-    <div id="resultado"></div>
+    <div>
+        <p>Optimal Solution: <span id="optimalSolution"></span></p>
+        <p>Decision Variables (x): <span id="decisionVariables"></span></p>
+    </div>
 
     <script>
-        async function optimizar() {
-            const costos = document.getElementById("costos").value.split(",").map(parseFloat);
-            const utilidad = document.getElementById("utilidad").value.split(",").map(parseFloat);
-            const cantidades_disponibles = document.getElementById("cantidades_disponibles").value.split(",").map(parseFloat);
+        async function solveOptimization() {
+            const matrixA = JSON.parse("[" + document.getElementById("matrixA").value + "]");
+            const vectorB = JSON.parse("[" + document.getElementById("vectorB").value + "]");
+            const vectorC = JSON.parse("[" + document.getElementById("vectorC").value + "]");
 
             const data = {
-                costos: costos,
-                utilidad: utilidad,
-                cantidades_disponibles: cantidades_disponibles
+                "A": matrixA,
+                "b": vectorB,
+                "c": vectorC
             };
 
-            try {
-                const response = await fetch('http://localhost:8000/optimizar/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(data),
-                });
+            const response = await fetch('http://127.0.0.1:8000/solve', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            });
 
-                const resultado = await response.json();
-                document.getElementById("resultado").innerHTML = `
-                    <p>Cantidades óptimas:</p>
-                    <pre>${JSON.stringify(resultado.cantidades_optimas, null, 2)}</pre>
-                    <p>Beneficio máximo: ${resultado.beneficio_maximo}</p>
-                `;
-            } catch (error) {
-                console.error('Error al realizar la solicitud:', error);
-            }
+            const result = await response.json();
+
+            document.getElementById("optimalSolution").innerText = result.optimal_solution;
+            document.getElementById("decisionVariables").innerText = result.x.join(', ');
         }
     </script>
+
 </body>
 </html>
