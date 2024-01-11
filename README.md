@@ -1,5 +1,7 @@
 # OptimizacionAPI
  API de metodo simplex con FastAPI para poder utilizar otras dimensiones cambiar:
+
+
 SIZE_MATRIX_X = 1
 SIZE_MATRIX_Y = 6
 
